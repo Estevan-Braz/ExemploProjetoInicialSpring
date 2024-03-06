@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -14,6 +15,15 @@ public class Usuario {
     private long id;
     private String nome;
     private String email;
+    private Date dataNascimento;
+
+    public Date getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public void setDataNascimento(Date dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
 
     public long getId() {
         return id;
