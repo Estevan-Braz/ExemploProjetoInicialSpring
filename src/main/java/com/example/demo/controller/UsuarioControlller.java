@@ -11,48 +11,79 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping(path="/usuario")
 public class UsuarioControlller {
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
 
     @PostMapping(path="/add")
-    public @ResponseBody String addNewUser(
-            @RequestParam String nome, @RequestParam String email,
+    public String addNewUser(
+            @RequestParam String nome,
+            @RequestParam String email,
+            @RequestParam String senha,
             @RequestParam @DateTimeFormat(pattern="dd/MM/yyyy") Date dataNascimento
     ){
         Usuario usuario = new Usuario();
         usuario.setNome(nome);
         usuario.setEmail(email);
+        usuario.setSenha(senha);
         usuario.setDataNascimento(dataNascimento);
         usuarioRepositorio.save(usuario);
         return usuario + " salvo";
     }
 
     @GetMapping(path="/all")
-    public @ResponseBody Iterable<Usuario> getAllUsers(){
+    public Iterable<Usuario> getAllUsers(){
         return usuarioRepositorio.findAll();
     }
 
-    @GetMapping(path="/findByEmail")
-    public @ResponseBody Usuario findByEmail(
+    @GetMapping(path="/pegarporemail")
+    public Usuario pegarPorEmail(
             @RequestParam String email
     ){
-        Usuario achou = usuarioRepositorio.findByEmail(email);
-        return achou;
+        return usuarioRepositorio.findByEmail(email);
     }
 
-    @GetMapping(path="/existeEmail")
-    public @ResponseBody boolean existeEmail(
-            @RequestParam String email
+    @PostMapping(path="/verificalogin")
+    public String verificaLogin(
+            @RequestParam String email,
+            @RequestParam String senha
     ){
-        return  usuarioRepositorio.existsByEmail(email);
+        Usuario usuario = usuarioRepositorio.findByEmailAndSenha(email, senha);
+        if(usuario != null){
+            return "Logou";
+        }else{
+            return "Não Logou";
+        }
+    }
 
+    @GetMapping(path="/nascimento")
+    public Iterable<Usuario> pegarAniversariantes(
+            @RequestParam @DateTimeFormat(pattern="dd/MM/yyyy") Date dataInicio,
+            @RequestParam @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFim
+    ){
+        return usuarioRepositorio.findByDataNascimentoIsBetween(dataInicio, dataFim);
     }
 
     @GetMapping(path="/{id}")
-    public @ResponseBody Optional<Usuario> getUsuario(@PathVariable String id){
-        return usuarioRepositorio.findById(Long.parseLong(id));
+    public Optional<Usuario> pegarPorId(
+            @PathVariable Long id
+    ){
+        return usuarioRepositorio.findById(id);
+    }
+    @PostMapping(path="/atualizardatanascimento")
+    public String atualizarDataNascimento(
+            @RequestParam Long id,
+            @RequestParam @DateTimeFormat(pattern="dd/MM/yyyy") Date dataNascimento
+    ){
+        Optional <Usuario> usuario = usuarioRepositorio.findById(id);
+        if(usuario.isPresent()){
+            usuario.get().setDataNascimento(dataNascimento);
+            usuarioRepositorio.save(usuario.get());
+            return "Atualizou";
+        }else{
+            return "Não Encontrou";
+        }
     }
 }
