@@ -13,4 +13,6 @@ public interface UsuarioRepositorio extends CrudRepository<Usuario, Long> {
     Usuario findByEmailAndSenha(String email, String senha);
 
     Iterable<Usuario> findByDataNascimentoIsBetween(Date start, Date end);
+
+    Iterable<Usuario> findByUltimoLoginAfter(Date lastDay);
 }

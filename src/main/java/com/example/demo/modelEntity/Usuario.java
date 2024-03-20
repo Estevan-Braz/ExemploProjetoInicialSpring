@@ -1,9 +1,6 @@
 package com.example.demo.modelEntity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.Objects;
@@ -17,6 +14,16 @@ public class Usuario {
     private String email;
     private Date dataNascimento;
     private String senha;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date ultimoLogin;
+
+    public Date getUltimoLogin() {
+        return ultimoLogin;
+    }
+
+    public void setUltimoLogin(Date ultimoLogin) {
+        this.ultimoLogin = ultimoLogin;
+    }
 
     public String getSenha() {
         return senha;

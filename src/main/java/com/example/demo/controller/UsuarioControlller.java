@@ -2,10 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.modelEntity.Usuario;
 import com.example.demo.repository.UsuarioRepositorio;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -24,13 +22,17 @@ public class UsuarioControlller {
             @RequestParam String senha,
             @RequestParam @DateTimeFormat(pattern="dd/MM/yyyy") Date dataNascimento
     ){
-        Usuario usuario = new Usuario();
-        usuario.setNome(nome);
-        usuario.setEmail(email);
-        usuario.setSenha(senha);
-        usuario.setDataNascimento(dataNascimento);
-        usuarioRepositorio.save(usuario);
-        return usuario + " salvo";
+        if (usuarioRepositorio.findByEmail(email) != null){
+            return "Email já existe";
+        }else {
+            Usuario usuario = new Usuario();
+            usuario.setNome(nome);
+            usuario.setEmail(email);
+            usuario.setSenha(senha);
+            usuario.setDataNascimento(dataNascimento);
+            usuarioRepositorio.save(usuario);
+            return usuario + " salvo";
+        }
     }
 
     @GetMapping(path="/all")
@@ -52,6 +54,8 @@ public class UsuarioControlller {
     ){
         Usuario usuario = usuarioRepositorio.findByEmailAndSenha(email, senha);
         if(usuario != null){
+            usuario.setUltimoLogin(new Date(System.currentTimeMillis()));
+            usuarioRepositorio.save(usuario);
             return "Logou";
         }else{
             return "Não Logou";
@@ -85,5 +89,11 @@ public class UsuarioControlller {
         }else{
             return "Não Encontrou";
         }
+    }
+
+    @GetMapping(path="/pegarlogados")
+    public Iterable<Usuario> getLogados(){
+        Date lastDay = new Date(System.currentTimeMillis() - (1000*3600*24));
+        return usuarioRepositorio.findByUltimoLoginAfter(lastDay);
     }
 }
