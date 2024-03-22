@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
+import com.example.demo.modelEntity.Categoria;
 import com.example.demo.modelEntity.Produto;
+import com.example.demo.repository.CategoriaRepositorio;
 import com.example.demo.repository.ProdutoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,19 +16,29 @@ public class ProdutoController {
     @Autowired
     ProdutoRepositorio produtoRepositorio;
 
+    @Autowired
+    CategoriaRepositorio categoriaRepositorio;
+
     @PostMapping(path="/add")
     public String add(
             @RequestParam String nome,
             @RequestParam String descricao,
-            @RequestParam int quantidadeEstoque
+            @RequestParam int quantidadeEstoque,
+            @RequestParam Long fkIdCategoria
     ){
-        Produto produto = new Produto();
-        produto.setNome(nome);
-        produto.setDescricao(descricao);
-        produto.setQuantidadeEstoque(quantidadeEstoque);
+        Optional<Categoria> categoria = categoriaRepositorio.findById(fkIdCategoria);
+        if(categoria.isPresent()){
+            Produto produto = new Produto();
+            produto.setNome(nome);
+            produto.setDescricao(descricao);
+            produto.setQuantidadeEstoque(quantidadeEstoque);
+            produto.setCategoria(categoria.get());
+            produtoRepositorio.save(produto);
+            return produto + "[Salvo]";
+        }else{
+            return "[Erro] - Categoria não encontrada";
+        }
 
-        produtoRepositorio.save(produto);
-        return produto + "[Salvo]";
     }
 
     @GetMapping(path="/all")
@@ -53,5 +65,17 @@ public class ProdutoController {
     public Iterable<Produto> findAlterados(){
         Date lastDay = new Date(System.currentTimeMillis() - (3600 * 1000 * 24));
         return produtoRepositorio.findByUpdatedAtAfter(lastDay);
+    }
+
+    @GetMapping(path="/pegarporcategoria")
+    public Iterable<Produto> pegarPorCategoria(
+            @RequestParam Long fkIdCategoria
+    ){
+        Optional<Categoria> categoria = categoriaRepositorio.findById(fkIdCategoria);
+        if(categoria.isPresent()) {
+            return produtoRepositorio.findByCategoria(categoria.get());
+        } else{
+          return null;
+        }
     }
 }

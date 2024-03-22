@@ -21,6 +21,18 @@ public class Produto {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "fk_id_categoria")
+    private Categoria categoria;
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
