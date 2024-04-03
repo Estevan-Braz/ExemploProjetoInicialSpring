@@ -1,16 +1,11 @@
 package com.example.demo.controller;
 
-import com.example.demo.modelEntity.Movimentacao;
-import com.example.demo.modelEntity.Produto;
-import com.example.demo.modelEntity.TipoMovimentacao;
-import com.example.demo.modelEntity.Usuario;
+import com.example.demo.modelEntity.*;
 import com.example.demo.repository.MovimentacaoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +18,8 @@ public class MovimentacaoController {
     private ProdutoController produtoController;
     @Autowired
     private UsuarioControlller usuarioControlller;
+    @Autowired
+    private CategoriaController categoriaController;
     @PostMapping(path="/add")
     public Movimentacao add(
             @RequestParam Long id_usuario,
@@ -45,4 +42,28 @@ public class MovimentacaoController {
         }
 
     }
+
+    @GetMapping(path="/all")
+    public Iterable<Movimentacao> findall(){
+        return movimentacaoRepositorio.findAll();
+    }
+
+    @GetMapping(path="findByCategoria")
+    public Iterable<Movimentacao> findByCategoria(
+            @RequestParam Long id_categoria
+    ){
+        Optional<Categoria> categora = categoriaController.findById(id_categoria);
+        if (categora.isPresent()){
+            return movimentacaoRepositorio.findByProduto_Categoria(categora.get());
+        }
+        return null;
+    }
+
+    @GetMapping(path="/countByCategoria")
+    public List<MovimentacaoCountDTO> getCountByCategoria(
+            @RequestParam Long id_categoria
+    ){
+        return movimentacaoRepositorio.countByCategoria(id_categoria);
+    }
 }
+
