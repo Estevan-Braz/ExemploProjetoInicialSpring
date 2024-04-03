@@ -41,13 +41,20 @@ public class ProdutoController {
 
     }
 
+    @GetMapping(path="findById")
+    public Optional<Produto> findById(
+            @RequestParam Long id
+    ){
+        return produtoRepositorio.findById(id);
+    }
+
     @GetMapping(path="/all")
     public Iterable<Produto> findAll(){
         return produtoRepositorio.findAll();
     }
 
-    @PostMapping(path="/update")
-    public String udpate(
+    @PostMapping(path="/updateEstoque")
+    public String udpateEstoque(
             @RequestParam Long id,
             @RequestParam int quantidadeEstoque
     ){
