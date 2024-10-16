@@ -13,25 +13,47 @@ public class CategoriaController {
     @Autowired
     private CategoriaRepositorio categoriaRepositorio;
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(path = "/add")
-    public String add(
+    public Categoria add(
             @RequestParam String nome
     ){
         Categoria categoria = new Categoria();
         categoria.setNome(nome);
-        categoriaRepositorio.save(categoria);
-        return "Categoria Adicionada";
+        return categoriaRepositorio.save(categoria);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(path="/all")
     public Iterable<Categoria> getAll(){
         return categoriaRepositorio.findAll();
     }
 
+
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(path="/findById")
     public Optional<Categoria> findById(
             @RequestParam Long id
     ){
         return categoriaRepositorio.findById(id);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PutMapping(path="/update")
+    public void atualizar(
+            @RequestParam Long id,
+            @RequestParam String nome
+    ){
+        Categoria c = this.findById(id).get();
+        c.setNome(nome);
+        categoriaRepositorio.save(c);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @DeleteMapping(path="/delete")
+    public void deleteById(
+            @RequestParam Long id
+    ){
+        categoriaRepositorio.deleteById(id);
     }
 }
